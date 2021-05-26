@@ -1,0 +1,14 @@
+table,
+td {
+    padding: 2px;
+    border: 1px solid #333;
+    text-align: center;
+    width: 250px;
+}
+
+thead,
+tfoot {
+    font-size: large;
+    background-color: #333;
+    color: #fff;
+}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="style.css">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+</head>
+<body>
+
+<input type="text" id="nom" placeholder="Nom de famille :">
+
+<input type="text" id="prenom" placeholder="Prenom :">
+
+<button onclick="ajouter()">Valider</button>
+<button onclick="montrer()">Ajouter au tableau</button>
+
+<table id="tableau">
+    <thead>
+    <tr>
+        <th colspan="2">Personnes : </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>Prenom :</td>
+        <td>Nom :</td>
+
+
+
+    </tr>
+    </tbody>
+</table>
+
+<script>
+
+    function ajouter() {
+
+        let noeud = "personne.json";
+        let url = 'https://tp2fire-a9dd5-default-rtdb.europe-west1.firebasedatabase.app/' + noeud;
+
+        let personnes = [];
+        let personne = {nom: document.getElementById('nom').value, prenom: document.getElementById('prenom').value};
+        document.getElementById('nom').value = '';
+        document.getElementById('prenom').value = '';
+
+        personnes.push(personne); // ajoutes une personne ds le tableau "personnes"
+        let param = {};
+        param.method = 'PUT';
+        param.header = {'Content-Type': 'application/json'};
+        param.body = JSON.stringify(personnes);
+        fetch(url, param)
+            .then(response => response.json())
+            .then(info => {
+                console.log(info);
+            })
+    }
+
+    function montrer() {
+        let noeud = "personne.json";
+        let url = 'https://tp2fire-a9dd5-default-rtdb.europe-west1.firebasedatabase.app/' + noeud;
+        fetch(url)
+        .then(response => response.json())
+        .then(info => {console.log(info);})
+
+        // let personne = {nom: document.getElementById('nom').value ,prenom: document.getElementById('prenom').value};
+        let prenom = 'testPrenom';
+        let nom = 'testNom';
+
+        t = document.getElementById("tableau");
+        t.insertAdjacentHTML("beforeend","<tr><td>" + prenom + "</td><td>" + nom + "</td></tr>");
+
+
+        // element.insertAdjacentHTML(position, text);
+        // pour la position beforeend : Juste à l'intérieur de l'element , après son dernier enfant.
+    }
+
+</script>
+
+<!--
+TP 2 Liste de Personnes :
+Ajouter une personne dans un tableau Javascript à l'aide de champ <input
+Astuce : let personne = {nom 'PITT', prenom :'Brad' };
+et afficher se tableau en HTML
+Publier le site sur firebase hosting
+mémoriser le tableau sur firebase real time database
+-->
+
+</body>
+</html>
