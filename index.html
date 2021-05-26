@@ -4,47 +4,211 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+    <title>Liste de personnes</title>
 </head>
 <body>
 
+<!-- TP 3 déployer sur Git et sur Firebase hosting :
+
+- Ajouter un répertoire docs et venir bloquer avec .gitingore
+
+- Ajouter  une branche develop à votre repository et merger cette branche
+
+- Ajouter la possibilité d'enlever une personne de la liste et faire un commit & un push
+
+- Bonus utiliser fontawesome -->
+
+<div class="container">
+    <!-- 12 colonnes de bootrap -->
+    <div class="row"> <!-- ouverture de lignes -->
+        <!-- 4 colonnes au milieu -->
+        <!-- offset-4 decale de 4 colonnes -->
+        <div class="offset-4 col-4">
+            <h1>Liste de personnes</h1>
+            <div class="form-group">
+                <input id="prenom" class="form-control" placeholder="Prénom">
+            </div>
+            <div class="form-group">
+                <input id="nom" class="form-control" placeholder="Nom">
+            </div>
+
+            <button onclick="ajouter()" class="btn btn-success">Ajouter</button>
+            <br>
+
+            <table class="mt-4 table table-striped">
+                <thead>
+                <tr>
+                    <th>Pénom</th>
+                    <th>Nom</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="liste">
+                <!--<tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            -->
+                </tbody>
+            </table>
+
+
+
+
+        </div>
+
+    </div>
+</div>
+
+
+<script>
+    // créer un noeud en json
+    let noeud = 'personnes.json';
+    let url = 'https://tp2fire-a9dd5-default-rtdb.europe-west1.firebasedatabase.app/'+noeud;
+    let tableau = [];
+    //-----------------------------------------------------
+    fetch(url)
+        .then( response => response.json())
+        .then (tab =>
+        {
+            if (tab != undefined)
+            {
+                tableau = tab;
+                afficherHTML();
+            }
+        });
+
+    //-----------------------------------------------------
+    //  ajouter
+    //-----------------------------------------------------
+    function ajouter()
+    {
+
+        let nom = document.getElementById('nom').value;
+        let prenom = document.getElementById('prenom').value;
+        document.getElementById('nom').value = ''; // vider input
+        document.getElementById('prenom').value = '';
+        let personne = {};
+        personne.nom = nom;
+        personne.prenom = prenom;
+        tableau.push(personne);
+        afficherHTML();
+        ajouterFire();
+    }
+    //-----------------------------------------------------
+    //  afficher tableau HTML
+    //-----------------------------------------------------
+    function afficherHTML()
+    {
+        // je vide le tableau
+        document.getElementById('liste').innerHTML= '';
+        // parcours le tableau js pour ajouter <tr><td>...
+        for(let personne of tableau){
+
+            let tr = document.createElement('tr');//<tr></tr>
+            let td1 = document.createElement('td'); //<td></td>
+            let td2 = document.createElement('td'); //<td></td>
+            td1.textContent= personne.prenom ;//<td>John</td>
+            td2.textContent= personne.nom ;//<td>DOE</td>
+            // mettre td1 ds la balise tr
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            document.getElementById('liste').appendChild(tr); // <tbody><tr> ...
+        }
+    }
+    //-----------------------------------------------------
+    //  Ajouter dans firebase real time data base
+    //-----------------------------------------------------
+    function ajouterFire()
+    {
+
+        // https://gestion-equipe.firebaseio.com/fruits.json
+        let param = {}
+        param.method = 'PUT';
+        param.header = {'Content-Type': 'application/json' };
+        param.body = JSON.stringify(tableau); // je serialize le tab eb chaine de car
+        fetch(url,param)
+            .then( response => response.json())
+            .then (info =>
+            {
+                console.log(info);
+            });
+    }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
 <input type="text" id="nom" placeholder="Nom de famille :">
 
 <input type="text" id="prenom" placeholder="Prenom :">
 
 <button onclick="ajouter()">Valider</button>
-<button onclick="montrer()">Ajouter au tableau</button>
 
-<table id="tableau">
+<table class="table table-striped" id="tableau">
     <thead>
     <tr>
-        <th colspan="2">Personnes : </th>
+        <th colspan="2">Personnes :</th>
     </tr>
     </thead>
     <tbody>
     <tr>
         <td>Prenom :</td>
         <td>Nom :</td>
-
-
-
     </tr>
     </tbody>
 </table>
 
 <script>
-
+    let personnes = [];
+    // ----------------------------------------------------------------------------
+    // ajouter une personne
+    // ----------------------------------------------------------------------------
     function ajouter() {
 
         let noeud = "personne.json";
         let url = 'https://tp2fire-a9dd5-default-rtdb.europe-west1.firebasedatabase.app/' + noeud;
 
-        let personnes = [];
-        let personne = {nom: document.getElementById('nom').value, prenom: document.getElementById('prenom').value};
+        let nom = document.getElementById('nom').value;
+        let prenom = document.getElementById('prenom').value;
         document.getElementById('nom').value = '';
         document.getElementById('prenom').value = '';
 
+        let personne = {};
+        personne.nom = nom;
+        personne.prenom = prenom;
+
         personnes.push(personne); // ajoutes une personne ds le tableau "personnes"
+
         let param = {};
         param.method = 'PUT';
         param.header = {'Content-Type': 'application/json'};
@@ -54,21 +218,36 @@
             .then(info => {
                 console.log(info);
             })
+        montrer();
     }
 
+    // ----------------------------------------------------------------------------
+    // afficher tableau HTML
+    // ----------------------------------------------------------------------------
     function montrer() {
+
+        // je vide le tableau
+        document.getElementById('tableau').innerHTML = '';
+
+
+        for (let personne of tableau) {
+            t = document.getElementById("tableau");
+            t.insertAdjacentHTML("beforeend", "<tr><td>" + prenom + "</td><td>" + nom + "</td></tr>");
+        }
+
+
         let noeud = "personne.json";
         let url = 'https://tp2fire-a9dd5-default-rtdb.europe-west1.firebasedatabase.app/' + noeud;
         fetch(url)
-        .then(response => response.json())
-        .then(info => {console.log(info);})
+            .then(response => response.json())
+            .then(info => {
+                console.log(info);
+            })
 
-        // let personne = {nom: document.getElementById('nom').value ,prenom: document.getElementById('prenom').value};
-        let prenom = 'testPrenom';
-        let nom = 'testNom';
+
 
         t = document.getElementById("tableau");
-        t.insertAdjacentHTML("beforeend","<tr><td>" + prenom + "</td><td>" + nom + "</td></tr>");
+        t.insertAdjacentHTML("beforeend", "<tr><td>" + prenom + "</td><td>" + nom + "</td></tr>");
 
 
         // element.insertAdjacentHTML(position, text);
@@ -77,13 +256,6 @@
 
 </script>
 
-<!--
-TP 2 Liste de Personnes :
-Ajouter une personne dans un tableau Javascript à l'aide de champ <input
-Astuce : let personne = {nom 'PITT', prenom :'Brad' };
-et afficher se tableau en HTML
-Publier le site sur firebase hosting
-mémoriser le tableau sur firebase real time database
 -->
 
 </body>
